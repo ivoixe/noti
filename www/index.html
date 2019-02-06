@@ -42,7 +42,7 @@
             <!-- permission -->
             <h2 class="section" style="padding-top:180px;">Permission (iOS8)</h2>
             <div class="container">
-                <div onclick="hasPermission()">Granted?<br /><span>hasPermission()</span></div>
+                <div onclick="hasPermission()">PRUEBAS<br /><span>hasPermission()</span></div>
                 <div onclick="registerPermission()">Register<br /><span>registerPermission()</span></div>
             </div>
 
@@ -170,8 +170,52 @@
         <!-- permission -->
         <script type="text/javascript">
             hasPermission = function () {
+                alert('entra');
                 cordova.plugins.notification.local.hasPermission(function (granted) {
-                    showToast(granted ? 'Yes' : 'No');
+                    alert(granted);
+                    if( granted == false ) {
+
+                        alert("No permission");
+                        // If app doesnt have permission request it
+                        cordova.plugin.notification.local.registerPermission(function (granted) {
+
+                            console.warn("Ask for permission");
+                            if( granted == true ) {
+
+                                console.warn("Permission accepted");
+                                // If app is given permission try again
+                                testNotifications();
+
+                            } else {
+                                alert("We need permission to show you notifications");
+                            }
+
+                        });
+                    } else {
+
+                        var pathArray = window.location.pathname.split( "/www/" ),
+                            secondLevelLocation = window.location.protocol +"//"+ pathArray[0],
+                            now = new Date();
+
+
+                        alert("sending notification");
+
+                        var isAndroid = false;
+
+                        if ( device.platform === "Android" ) {
+                            isAndroid = true;
+                        }
+
+                        cordova.plugin.notification.local.schedule({
+                            id: 9,
+                            title: "Test notification 9",
+                            text: "This is a test notification",
+                            sound: isAndroid ? "file://sounds/notification.mp3" : "file://sounds/notification.caf",
+                            at: new Date( new Date().getTime() + 10 )
+                            // data: { secret:key }
+                        });
+
+                    }
                 });
             };
 
@@ -214,11 +258,37 @@
                 }]);
             };
 
+
+            /*******************************/
+         /*   var testNotifications = function () {
+
+                document.addEventListener("deviceready", function () {
+
+                    console.warn("testNotifications Started");
+
+                    // Checks for permission
+                    cordova.plugin.notification.local.hasPermission(function (granted) {
+
+                        console.warn("Testing permission");
+
+
+
+                    });
+
+                }, false);
+
+            };
+            /***************************************/
+
             scheduleDelayed = function () {
+
                 var now = new Date().getTime(),
                     _5_sec_from_now = new Date(now + 5 * 1000);
 
+
                 var sound = device.platform == 'Android' ? 'file://sound.mp3' : 'file://beep.caf';
+
+
 
                 cordova.plugins.notification.local.schedule({
                     id: 1,
@@ -228,6 +298,8 @@
                     sound: sound,
                     badge: 12
                 });
+
+
             };
 
             scheduleMinutely = function () {
@@ -384,12 +456,12 @@
 
                 cordova.plugins.notification.local.on('schedule', function (notification) {
                     console.log('onschedule', arguments);
-                    // showToast('scheduled: ' + notification.id);
+                    showToast('scheduled: ' + notification.id);
                 });
 
                 cordova.plugins.notification.local.on('update', function (notification) {
                     console.log('onupdate', arguments);
-                    // showToast('updated: ' + notification.id);
+                    showToast('updated: ' + notification.id);
                 });
 
                 cordova.plugins.notification.local.on('trigger', function (notification) {
@@ -404,7 +476,7 @@
 
                 cordova.plugins.notification.local.on('cancel', function (notification) {
                     console.log('oncancel', arguments);
-                    // showToast('canceled: ' + notification.id);
+                     showToast('canceled: ' + notification.id);
                 });
 
                 cordova.plugins.notification.local.on('clear', function (notification) {
@@ -414,12 +486,12 @@
 
                 cordova.plugins.notification.local.on('cancelall', function () {
                     console.log('oncancelall', arguments);
-                    // showToast('canceled all');
+                    showToast('canceled all');
                 });
 
                 cordova.plugins.notification.local.on('clearall', function () {
                     console.log('onclearall', arguments);
-                    // showToast('cleared all');
+                    showToast('cleared all');
                 });
             }, false);
         </script>
